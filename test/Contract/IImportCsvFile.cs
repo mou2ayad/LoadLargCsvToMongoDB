@@ -1,7 +1,9 @@
-﻿namespace test.Contract
+﻿using test.Model;
+
+namespace test.Contract
 {
     public interface IImportCsvFile
     {
-        void Import(string filePath);
+        void Import(UploadedFileInfo csvFile);
     }
 }

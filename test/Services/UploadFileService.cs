@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using test.Config;
+using test.Model;
 
 namespace test.Services
 {
@@ -17,7 +19,7 @@ namespace test.Services
         {
             _config = options.Value;
         }
-        public async Task Upload(HttpRequest request)
+        public async Task<UploadedFileInfo> Upload(HttpRequest request)
         {
             var mediaTypeHeader = ExtractMediaTypeHeader(request);
 
@@ -33,11 +35,13 @@ namespace test.Services
                     !string.IsNullOrEmpty(contentDisposition.FileName.Value))
                 {
                     AssertFileExtension(contentDisposition.FileName.Value);
-                    var saveToPath = Path.Combine(_config.StoredFilesPath, contentDisposition.FileName.Value);
-
+                    FileInfo fileInfo = new FileInfo(contentDisposition.FileName.Value);
+                    string tempFileName = Guid.NewGuid()+fileInfo.Extension;
+                    var saveToPath = Path.Combine(_config.StoredFilesPath, tempFileName);
                     await using var targetStream = File.Create(saveToPath);
                     await section.Body.CopyToAsync(targetStream);
-                    return;
+                    return new UploadedFileInfo
+                        {FullTempName = saveToPath, OriginalName = contentDisposition.FileName.Value};
                 }
 
                 section = await reader.ReadNextSectionAsync();
