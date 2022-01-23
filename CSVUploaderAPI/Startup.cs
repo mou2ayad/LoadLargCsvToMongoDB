@@ -40,6 +40,7 @@ namespace CSVUploaderAPI
                 .AddSingleton<UploadFileService>()
                 .AddTransient<ImportCsvFileService>()
                 .AddTransient<ImportToMongoDbHandler>()
+                .AddTransient(typeof(IEventDispatcher<>),typeof(EventDispatcher<>))
                 .AddTransient<IDbRepository, MongoDbClothesRepository>()
                 .AddTransient<IFileRepository, JsonFileRepository>()
                 .AddSingleton<IMongoClient>(new MongoClient(Configuration["ConnectionStrings:ClothesDB"]))
@@ -85,7 +86,7 @@ namespace CSVUploaderAPI
             var storedFilesPath = config.GetValue<string>("UploadFileConfig:StoredFilesPath");
             CreateDirectoryIfNotExists(storedFilesPath);
 
-            var jsonOutputDirectory = config.GetValue<string>("JsonOutput:JsonOutputDirectory");
+            var jsonOutputDirectory = config.GetValue<string>("JsonOutputConfig:JsonOutputDirectory");
             CreateDirectoryIfNotExists(jsonOutputDirectory);
 
         }

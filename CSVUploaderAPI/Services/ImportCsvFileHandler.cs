@@ -11,12 +11,12 @@ namespace CSVUploaderAPI.Services
 {
     public class ImportCsvFileService :IConsumer<FileUploadedEvent>
     {
-        private readonly IMessageBus _bus;
+        private readonly IEventDispatcher<CsvRecordParsedEvent> _dispatcher;
         private readonly IFileRepository _jsonRepository;
-        public ImportCsvFileService(IMessageBus bus, IFileRepository repository )
+        public ImportCsvFileService(IFileRepository repository, IEventDispatcher<CsvRecordParsedEvent> dispatcher)
         {
-            _bus = bus;
             _jsonRepository = repository;
+            _dispatcher = dispatcher;
         }
         
         public void Import(UploadedFileInfo csvFile)
@@ -29,7 +29,7 @@ namespace CSVUploaderAPI.Services
             while (csv.Read())
             {
                 var @event = CsvRecordParsedEvent.From(csv.GetRecord<Clothe>(), csvFile.OriginalName);
-                _bus.Publish(@event);
+                _dispatcher.Dispatch(@event);
                 _jsonRepository.Write(@event.Record);
             }
             _jsonRepository.CloseFile();

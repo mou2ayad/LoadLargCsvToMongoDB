@@ -3,23 +3,23 @@ using System.IO;
 using System.Threading.Tasks;
 using CSVUploaderAPI.Bus;
 using CSVUploaderAPI.Config;
+using CSVUploaderAPI.Contract;
 using CSVUploaderAPI.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
-using SlimMessageBus;
 
 namespace CSVUploaderAPI.Services
 {
     public class UploadFileService
     {
         private readonly UploadFileConfig _config;
-        private readonly IMessageBus _bus;
-        public UploadFileService(IOptions<UploadFileConfig> options, IMessageBus bus)
+        private readonly IEventDispatcher<FileUploadedEvent> _dispatcher;
+        public UploadFileService(IOptions<UploadFileConfig> options, IEventDispatcher<FileUploadedEvent> dispatcher)
         {
-            _bus = bus;
+            _dispatcher = dispatcher;
             _config = options.Value;
         }
 
@@ -27,7 +27,7 @@ namespace CSVUploaderAPI.Services
         {
             var mediaTypeHeader = ExtractMediaTypeHeader(request);
             var file = await StartUpload(mediaTypeHeader.Boundary.Value, request.Body);
-             await _bus.Publish(new FileUploadedEvent(file));
+             _dispatcher.Dispatch(new FileUploadedEvent(file));
         }
         private async Task<UploadedFileInfo> StartUpload(string boundary, Stream body)
         {
