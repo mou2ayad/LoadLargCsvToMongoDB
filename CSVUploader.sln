@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31410.357
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSVUploaderAPI", "test\CSVUploaderAPI.csproj", "{29AC63CD-5D69-4CFE-8EA6-0A1384D2D15B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSVUploaderAPI", "CSVUploaderAPI\CSVUploaderAPI.csproj", "{29AC63CD-5D69-4CFE-8EA6-0A1384D2D15B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CsvUploader.Utils", "CsvUploader.Utils\CsvUploader.Utils.csproj", "{934C1F7E-E4F1-4F34-B171-A97171754AB7}"
 EndProject
