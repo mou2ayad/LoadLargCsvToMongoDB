@@ -1,4 +1,4 @@
-﻿namespace test.Config
+﻿namespace CSVUploaderAPI.Config
 {
     public class JsonOutputConfig
     {

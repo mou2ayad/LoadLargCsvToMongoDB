@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using CSVUploaderAPI.Contract;
+using CSVUploaderAPI.Model;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
-using test.Contract;
-using test.Model;
 
-namespace test.Services
+namespace CSVUploaderAPI.Services
 {
     public class MongoDbClothesRepository :IDbRepository
     {

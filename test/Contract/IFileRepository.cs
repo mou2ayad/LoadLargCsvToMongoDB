@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace test.Contract
+namespace CSVUploaderAPI.Contract
 {
     public interface IFileRepository :IDisposable
     {

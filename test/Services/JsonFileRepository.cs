@@ -1,10 +1,10 @@
 ﻿using System.IO;
+using CSVUploaderAPI.Config;
+using CSVUploaderAPI.Contract;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using test.Config;
-using test.Contract;
 
-namespace test.Services
+namespace CSVUploaderAPI.Services
 {
     public class JsonFileRepository : IFileRepository
     {

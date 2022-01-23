@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace test.Model
+namespace CSVUploaderAPI.Model
 {
     public class ClotheDoa
     {

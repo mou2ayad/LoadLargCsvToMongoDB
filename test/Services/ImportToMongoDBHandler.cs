@@ -1,11 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using CSVUploaderAPI.Bus;
+using CSVUploaderAPI.Contract;
 using SlimMessageBus;
-using test.Bus;
-using test.Contract;
 
-namespace test.Services
+namespace CSVUploaderAPI.Services
 {
     public class ImportToMongoDbHandler : IConsumer<CsvRecordParsedEvent>
     {

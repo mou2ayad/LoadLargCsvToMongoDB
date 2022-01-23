@@ -1,18 +1,21 @@
+using System.IO;
+using CsvUploader.Utils.ErrorHandling;
+using CSVUploaderAPI.Bus;
+using CSVUploaderAPI.Config;
+using CSVUploaderAPI.Contract;
+using CSVUploaderAPI.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using MongoDB.Driver;
 using SlimMessageBus.Host.Memory;
-using test.Bus;
-using test.Config;
-using test.Contract;
-using test.Services;
 using SlimMessageBus.Host.MsDependencyInjection;
 
-namespace test
+namespace CSVUploaderAPI
 {
     public class Startup
     {
@@ -30,7 +33,7 @@ namespace test
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "test", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "CSVUploaderAPI", Version = "v1" });
             });
             services.Configure<UploadFileConfig>(Configuration.GetSection("UploadFileConfig"))
                 .Configure<JsonOutputConfig>(Configuration.GetSection("JsonOutputConfig"))
@@ -58,13 +61,12 @@ namespace test
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> log, IConfiguration config)
         {
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "test v1"));
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "CSVUploader v1"));
             }
 
             app.UseHttpsRedirection();
@@ -73,8 +75,25 @@ namespace test
 
             app.UseAuthorization();
 
+            app.UseCustomErrorHandler(log, "CSVUploaderAPI", env.IsDevelopment());
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+            CreateRequiredFolders(config);
+        }
 
+        public void CreateRequiredFolders(IConfiguration config)
+        {
+            var storedFilesPath = config.GetValue<string>("UploadFileConfig:StoredFilesPath");
+            CreateDirectoryIfNotExists(storedFilesPath);
+
+            var jsonOutputDirectory = config.GetValue<string>("JsonOutput:JsonOutputDirectory");
+            CreateDirectoryIfNotExists(jsonOutputDirectory);
+
+        }
+
+        public static void CreateDirectoryIfNotExists(string path)
+        {
+            if (!Directory.Exists(path))
+                Directory.CreateDirectory(path);
         }
     }
 }

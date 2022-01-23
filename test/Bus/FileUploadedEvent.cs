@@ -1,6 +1,6 @@
-﻿using test.Model;
+﻿using CSVUploaderAPI.Model;
 
-namespace test.Bus
+namespace CSVUploaderAPI.Bus
 {
     public class FileUploadedEvent
     {

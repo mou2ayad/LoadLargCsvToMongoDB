@@ -2,12 +2,12 @@
 using System.IO;
 using System.Threading.Tasks;
 using CsvHelper;
+using CSVUploaderAPI.Bus;
+using CSVUploaderAPI.Contract;
+using CSVUploaderAPI.Model;
 using SlimMessageBus;
-using test.Bus;
-using test.Contract;
-using test.Model;
 
-namespace test.Services
+namespace CSVUploaderAPI.Services
 {
     public class ImportCsvFileService :IConsumer<FileUploadedEvent>
     {

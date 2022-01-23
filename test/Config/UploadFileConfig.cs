@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace test.Config
+namespace CSVUploaderAPI.Config
 {
     public class UploadFileConfig
     {

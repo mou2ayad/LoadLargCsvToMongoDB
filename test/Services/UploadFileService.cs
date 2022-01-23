@@ -1,17 +1,17 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using CSVUploaderAPI.Bus;
+using CSVUploaderAPI.Config;
+using CSVUploaderAPI.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using SlimMessageBus;
-using test.Bus;
-using test.Config;
-using test.Model;
 
-namespace test.Services
+namespace CSVUploaderAPI.Services
 {
     public class UploadFileService
     {

@@ -1,4 +1,4 @@
-﻿namespace test.Model
+﻿namespace CSVUploaderAPI.Model
 {
     public class Clothe
     {

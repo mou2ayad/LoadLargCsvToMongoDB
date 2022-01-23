@@ -1,10 +1,10 @@
 ﻿using System.Threading.Tasks;
+using CSVUploaderAPI.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using test.Services;
 
-namespace test.Controllers
+namespace CSVUploaderAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -15,9 +15,9 @@ namespace test.Controllers
         public UploadFileController(UploadFileService uploadFileService) => _uploadFileService = uploadFileService;
 
         [HttpPost]
-        [Route(nameof(UploadLargeFile))]
+        [Route(nameof(UploadCSVFile))]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = long.MaxValue)]
-        public async Task<IActionResult> UploadLargeFile()
+        public async Task<IActionResult> UploadCSVFile()
         {
             try
             {

@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
-using test.Model;
+using CSVUploaderAPI.Model;
 
-namespace test.Contract
+namespace CSVUploaderAPI.Contract
 {
     public interface IDbRepository
     {
