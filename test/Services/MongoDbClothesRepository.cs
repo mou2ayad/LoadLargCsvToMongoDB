@@ -8,7 +8,7 @@ using test.Model;
 
 namespace test.Services
 {
-    public class MongoDbClothesRepository :IClothesRepository
+    public class MongoDbClothesRepository :IDbRepository
     {
         private const string CollectionName = "Clothes";
         private readonly IMongoDatabase _database;
@@ -39,6 +39,7 @@ namespace test.Services
         {
             try
             {
+                await Task.Delay(10000);
                 await Collection.InsertOneAsync(ClotheDoa.From(clothe, fromFile));
                 _logger.LogInformation("clothe {@clothe} is created", clothe.Key);
             }

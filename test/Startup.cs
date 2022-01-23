@@ -1,16 +1,16 @@
-using Hangfire;
-using Hangfire.MemoryStorage;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using MongoDB.Driver;
+using SlimMessageBus.Host.Memory;
+using test.Bus;
 using test.Config;
 using test.Contract;
 using test.Services;
+using SlimMessageBus.Host.MsDependencyInjection;
 
 namespace test
 {
@@ -33,16 +33,28 @@ namespace test
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "test", Version = "v1" });
             });
             services.Configure<UploadFileConfig>(Configuration.GetSection("UploadFileConfig"))
+                .Configure<JsonOutputConfig>(Configuration.GetSection("JsonOutputConfig"))
                 .AddSingleton<UploadFileService>()
-                .AddTransient<IImportCsvFile, ImportCsvFileService>()
-                .AddTransient<IClothesRepository, MongoDbClothesRepository>()
+                .AddTransient<ImportCsvFileService>()
+                .AddTransient<ImportToMongoDbHandler>()
+                .AddTransient<IDbRepository, MongoDbClothesRepository>()
+                .AddTransient<IFileRepository, JsonFileRepository>()
                 .AddSingleton<IMongoClient>(new MongoClient(Configuration["ConnectionStrings:ClothesDB"]))
-                .AddHangfireServer()
-                .AddHangfire(config =>
-                    config.SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
-                        .UseSimpleAssemblyNameTypeSerializer()
-                        .UseDefaultTypeSerializer()
-                        .UseMemoryStorage());
+                .AddSlimMessageBus((builder, svp) =>
+                {
+                    builder
+                        .Produce<FileUploadedEvent>(x => x.DefaultTopic("UploadedFile-Topic"))
+                        .Consume<FileUploadedEvent>(x =>
+                            x.Topic("UploadedFile-Topic").WithConsumer<ImportCsvFileService>())
+                        .Produce<CsvRecordParsedEvent>(x => x.DefaultTopic("CsvRecordParsed-Topic"))
+                        .Consume<CsvRecordParsedEvent>(x =>
+                            x.Topic("CsvRecordParsed-Topic").WithConsumer<ImportToMongoDbHandler>())
+                        .WithDependencyResolver(new MsDependencyInjectionDependencyResolver(svp))
+                        .WithProviderMemory(new MemoryMessageBusSettings
+                        {
+                            EnableMessageSerialization = false
+                        });
+                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -51,7 +63,6 @@ namespace test
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseHangfireDashboard();
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "test v1"));
             }
@@ -62,10 +73,8 @@ namespace test
 
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
+            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+
         }
     }
 }

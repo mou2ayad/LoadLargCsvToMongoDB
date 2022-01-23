@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
+using SlimMessageBus;
+using test.Bus;
 using test.Config;
 using test.Model;
 
@@ -14,16 +16,22 @@ namespace test.Services
     public class UploadFileService
     {
         private readonly UploadFileConfig _config;
-
-        public UploadFileService(IOptions<UploadFileConfig> options)
+        private readonly IMessageBus _bus;
+        public UploadFileService(IOptions<UploadFileConfig> options, IMessageBus bus)
         {
+            _bus = bus;
             _config = options.Value;
         }
-        public async Task<UploadedFileInfo> Upload(HttpRequest request)
+
+        public async Task Upload(HttpRequest request)
         {
             var mediaTypeHeader = ExtractMediaTypeHeader(request);
-
-            var reader = new MultipartReader(mediaTypeHeader.Boundary.Value, request.Body);
+            var file = await StartUpload(mediaTypeHeader.Boundary.Value, request.Body);
+             await _bus.Publish(new FileUploadedEvent(file));
+        }
+        private async Task<UploadedFileInfo> StartUpload(string boundary, Stream body)
+        {
+            var reader = new MultipartReader(boundary, body);
             var section = await reader.ReadNextSectionAsync();
 
             while (section != null)
@@ -41,7 +49,7 @@ namespace test.Services
                     await using var targetStream = File.Create(saveToPath);
                     await section.Body.CopyToAsync(targetStream);
                     return new UploadedFileInfo
-                        {FullTempName = saveToPath, OriginalName = contentDisposition.FileName.Value};
+                        { FullTempName = saveToPath, OriginalName = contentDisposition.FileName.Value };
                 }
 
                 section = await reader.ReadNextSectionAsync();

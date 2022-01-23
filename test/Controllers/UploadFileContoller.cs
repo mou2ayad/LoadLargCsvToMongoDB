@@ -1,12 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
-using Hangfire;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.Extensions.Logging;
-using test.Contract;
-using test.Model;
 using test.Services;
 
 namespace test.Controllers
@@ -16,14 +11,8 @@ namespace test.Controllers
     public class UploadFileController : ControllerBase
     {
         private readonly UploadFileService _uploadFileService;
-        private readonly ILogger<UploadFileController> _logger;
-        private readonly IImportCsvFile _importCsvFile;
-        public UploadFileController(UploadFileService uploadFileService, ILogger<UploadFileController> logger, IImportCsvFile importCsvFile)
-        {
-            _uploadFileService = uploadFileService;
-            _logger = logger;
-            _importCsvFile = importCsvFile;
-        }
+
+        public UploadFileController(UploadFileService uploadFileService) => _uploadFileService = uploadFileService;
 
         [HttpPost]
         [Route(nameof(UploadLargeFile))]
@@ -32,9 +21,8 @@ namespace test.Controllers
         {
             try
             {
-                var uploadedFile = await _uploadFileService.Upload(HttpContext.Request);
-                BackgroundJob.Enqueue(() => _importCsvFile.Import(uploadedFile));
-                return Ok();
+                 await _uploadFileService.Upload(HttpContext.Request);
+                 return Ok();
             }
             catch (UnsupportedContentTypeException)
             {

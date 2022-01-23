@@ -3,7 +3,7 @@ using test.Model;
 
 namespace test.Contract
 {
-    public interface IClothesRepository
+    public interface IDbRepository
     {
         Task Insert(string fromFile, params Clothe[] clothes);
     }
