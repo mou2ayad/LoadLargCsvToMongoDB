@@ -39,7 +39,6 @@ namespace CSVUploaderAPI.Services
         {
             try
             {
-                await Task.Delay(10000);
                 await Collection.InsertOneAsync(ClotheDoa.From(clothe, fromFile));
                 _logger.LogInformation("clothe {@clothe} is created", clothe.Key);
             }
@@ -51,7 +50,7 @@ namespace CSVUploaderAPI.Services
         }
 
         public Task Insert(string fromFile, params Clothe[] clothes)
-            => clothes.Length > 0 ?
+            => clothes.Length > 1 ?
             InsertMany(fromFile, clothes) : 
             InsertOne(fromFile, clothes.FirstOrDefault());
 

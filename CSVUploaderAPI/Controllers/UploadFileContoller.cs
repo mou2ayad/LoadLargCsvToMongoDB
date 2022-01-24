@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using CSVUploaderAPI.Attributes;
 using CSVUploaderAPI.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -17,6 +18,7 @@ namespace CSVUploaderAPI.Controllers
         [HttpPost]
         [Route(nameof(UploadCSVFile))]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = long.MaxValue)]
+        [DisableFormValueModelBinding]
         public async Task<IActionResult> UploadCSVFile()
         {
             try
