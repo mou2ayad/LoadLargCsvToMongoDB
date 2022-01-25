@@ -1,7 +1,9 @@
-﻿namespace CSVUploaderAPI.Contract
+﻿using System.Threading.Tasks;
+
+namespace CSVUploaderAPI.Contract
 {
     public interface IEventDispatcher<T>
     {
-        public void Dispatch(IDomainEvent<T> @event);
+        public Task Dispatch(IDomainEvent<T> @event);
     }
 }

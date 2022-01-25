@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace CSVUploaderAPI.Contract
 {
     public interface IFileRepository :IDisposable
     {
-        void OpenFile(string filePath);
-        void Write(object ob);
-        void CloseFile();
+        Task OpenFile(string filePath);
+        Task Write(object ob);
+        Task CloseFile();
     }
 }

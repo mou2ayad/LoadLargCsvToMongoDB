@@ -27,7 +27,7 @@ namespace CSVUploaderAPI.Services
         {
             var mediaTypeHeader = ExtractMediaTypeHeader(request);
             var file = await StartUpload(mediaTypeHeader.Boundary.Value, request.Body);
-             _dispatcher.Dispatch(new FileUploadedEvent(file));
+             await _dispatcher.Dispatch(new FileUploadedEvent(file));
         }
         private async Task<UploadedFileInfo> StartUpload(string boundary, Stream body)
         {

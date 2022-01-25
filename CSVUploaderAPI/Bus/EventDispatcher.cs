@@ -1,4 +1,5 @@
-﻿using CSVUploaderAPI.Contract;
+﻿using System.Threading.Tasks;
+using CSVUploaderAPI.Contract;
 using Microsoft.Extensions.Logging;
 using SlimMessageBus;
 
@@ -15,10 +16,10 @@ namespace CSVUploaderAPI.Bus
             _logger = logger;
         }
 
-        public void Dispatch(IDomainEvent<T> @event)
+        public async Task Dispatch(IDomainEvent<T> @event)
         {
             _logger.LogInformation($"Dispatching a new event {@event.GetEvent().GetType().Name}");
-            _bus.Publish(@event.GetEvent());
+            await _bus.Publish(@event.GetEvent());
         }
     }
 }

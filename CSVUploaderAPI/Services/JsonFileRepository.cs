@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Threading.Tasks;
 using CSVUploaderAPI.Config;
 using CSVUploaderAPI.Contract;
 using Microsoft.Extensions.Options;
@@ -11,38 +12,33 @@ namespace CSVUploaderAPI.Services
         private readonly JsonOutputConfig _config;
         private StreamWriter _streamWriter;
         private string _prefix;
-        public JsonFileRepository(IOptions<JsonOutputConfig> config)
-        {
+        public JsonFileRepository(IOptions<JsonOutputConfig> config) => 
             _config = config.Value;
-        }
 
-        public void Write(object ob)
+        public async Task Write(object ob)
         {
-            _streamWriter.Write(_prefix);
-            _streamWriter.WriteLine(JsonConvert.SerializeObject(ob,Formatting.Indented));
+            await _streamWriter.WriteAsync(_prefix);
+            await _streamWriter.WriteLineAsync(JsonConvert.SerializeObject(ob,Formatting.Indented));
             _prefix=",";
         }
 
-        public void CloseFile()
+        public async Task CloseFile()
         {
-            _streamWriter.WriteLine("]");
+            await _streamWriter.WriteLineAsync("]");
             Dispose();
         }
 
         public void Dispose() => _streamWriter.DisposeAsync();
 
-
-        public void OpenFile(string fromFile)
+        public async Task OpenFile(string fromFile)
         {
             var filePath = Path.Combine(_config.JsonOutputDirectory, fromFile + ".json");
             if (!_config.OverwriteIfExists && File.Exists(filePath))
                 throw new IOException($"File with name {filePath} already exist");
 
             _streamWriter = File.CreateText(filePath);
-            _streamWriter.WriteLine("[");
+            await _streamWriter.WriteLineAsync("[");
             _prefix = "";
-
         }
-
     }
 }

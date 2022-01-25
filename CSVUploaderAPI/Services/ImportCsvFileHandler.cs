@@ -19,26 +19,26 @@ namespace CSVUploaderAPI.Services
             _dispatcher = dispatcher;
         }
         
-        public void Import(UploadedFileInfo csvFile)
+        public async Task Import(UploadedFileInfo csvFile)
         {
             using var reader = new StreamReader(csvFile.FullTempName);
             using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
-            csv.Read();
+            await csv.ReadAsync();
             csv.ReadHeader();
-            _jsonRepository.OpenFile(csvFile.OriginalName);
-            while (csv.Read())
+            await _jsonRepository.OpenFile(csvFile.OriginalName);
+            while (await csv.ReadAsync())
             {
                 var @event = CsvRecordParsedEvent.From(csv.GetRecord<Clothe>(), csvFile.OriginalName);
-                _dispatcher.Dispatch(@event);
-                _jsonRepository.Write(@event.Record);
+                Task dispatchTask= _dispatcher.Dispatch(@event);
+                Task writeJsonTask= _jsonRepository.Write(@event.Record);
+                await Task.WhenAll(dispatchTask, writeJsonTask);
             }
-            _jsonRepository.CloseFile();
+            await _jsonRepository.CloseFile();
         }
 
-        public Task OnHandle(FileUploadedEvent message, string path)
+        public async Task OnHandle(FileUploadedEvent message, string path)
         {
-            Import(message.UploadedFile);
-            return Task.CompletedTask;
+            await Import(message.UploadedFile);
         }
 
     }
